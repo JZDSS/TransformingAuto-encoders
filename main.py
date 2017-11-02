@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from Capsule import Capsule
+from TransformingAutoencoder import TransformingAutoencoder as tae
 
 flags = tf.app.flags
 
@@ -21,8 +21,8 @@ def main(_):
         tf.gfile.DeleteRecursively(FLAGS.logdir)
         tf.gfile.MakeDirs(FLAGS.logdir)
 
-    capsule = Capsule(784, 10, 20, tf.sigmoid, 0.95, 'capsule1')
-    capsule.build()
+    encoder = tae()
+    encoder.forward()
 
     writer = tf.summary.FileWriter(FLAGS.logdir, sess.graph)
     writer.flush()

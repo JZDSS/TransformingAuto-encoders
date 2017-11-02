@@ -4,22 +4,21 @@ import math
 
 
 class Capsule:
-    def __init__(self, dim_input, num_recognise_units, num_generation_units, activation, weight_decay, name):
+    def __init__(self, dim_input, num_recognise_units, num_generation_units, activation_fn, weight_decay, name):
 
-        self.input = tf.placeholder(tf.float32, shape=[None, 784], name='input')
         self.dim_input = dim_input
         self.num_recognise_units = num_recognise_units
         self.num_generation_units = num_generation_units
-        self.activation = activation
+        self.activation_fn = activation_fn
         self.weight_decay = weight_decay
         self.name = name
 
-    def build(self):
+    def forward(self, input, shift):
         with tf.variable_scope(self.name):
 
             # recognition
-            recognition = layers.fully_connected(inputs=self.input, num_outputs=self.num_recognise_units,
-                                                 activation_fn=self.activation, scope='recognition',
+            recognition = layers.fully_connected(inputs=input, num_outputs=self.num_recognise_units,
+                                                 activation_fn=self.activation_fn, scope='recognition',
                                                  weights_initializer=tf.truncated_normal_initializer(
                                                      stddev=math.sqrt(2. / self.dim_input / self.num_recognise_units)),
                                                  weights_regularizer=layers.l2_regularizer(self.weight_decay),
@@ -27,15 +26,15 @@ class Capsule:
 
             # predict location
             location = layers.fully_connected(inputs=recognition, num_outputs=2,
-                                                 activation_fn=self.activation, scope='location',
+                                                 activation_fn=self.activation_fn, scope='location',
                                                  weights_initializer=tf.truncated_normal_initializer(
                                                      stddev=math.sqrt(2. / self.num_recognise_units / 2.)),
                                                  weights_regularizer=layers.l2_regularizer(self.weight_decay),
                                                  biases_regularizer=layers.l2_regularizer(self.weight_decay))
-
+            location = location + shift
             # predict probability
             probability = layers.fully_connected(recognition, num_outputs=1,
-                                                 activation_fn=self.activation, scope='probability',
+                                                 activation_fn=self.activation_fn, scope='probability',
                                                  weights_initializer=tf.truncated_normal_initializer(
                                                      stddev=math.sqrt(2. / self.num_recognise_units / 1)),
                                                  weights_regularizer=layers.l2_regularizer(self.weight_decay),
@@ -44,7 +43,7 @@ class Capsule:
 
             # generation
             generation = layers.fully_connected(inputs=location, num_outputs=self.num_generation_units,
-                                                 activation_fn=self.activation, scope='generation',
+                                                 activation_fn=self.activation_fn, scope='generation',
                                                  weights_initializer=tf.truncated_normal_initializer(
                                                      stddev=math.sqrt(2. / 2 / self.num_generation_units)),
                                                  weights_regularizer=layers.l2_regularizer(self.weight_decay),
@@ -52,7 +51,7 @@ class Capsule:
 
             # output
             output = layers.fully_connected(inputs=generation, num_outputs=self.dim_input,
-                                                activation_fn=self.activation, scope='output',
+                                                activation_fn=self.activation_fn, scope='output',
                                                 weights_initializer=tf.truncated_normal_initializer(
                                                     stddev=math.sqrt(2. / self.num_generation_units / self.dim_input)),
                                                 weights_regularizer=layers.l2_regularizer(self.weight_decay),
