@@ -7,8 +7,6 @@ class Capsule:
     def __init__(self, dim_input, num_recognise_units, num_generation_units, activation, weight_decay, name):
 
         self.input = tf.placeholder(tf.float32, shape=[None, 784], name='input')
-        self.shift = tf.placeholder(tf.float32, shape=[None, 2], name='shift')
-        self.expectation = tf.placeholder(tf.float32, shape=[None, 784], name='expectation')
         self.dim_input = dim_input
         self.num_recognise_units = num_recognise_units
         self.num_generation_units = num_generation_units
