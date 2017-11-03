@@ -1,6 +1,7 @@
 import tensorflow as tf
+import numpy as np
 
-from TransformingAutoencoder import TransformingAutoencoder as tae
+from TransformingAutoEncoder import TransformingAutoEncoder as tae
 
 flags = tf.app.flags
 
@@ -8,11 +9,11 @@ flags.DEFINE_string('logdir', './logs', 'Log direction')
 flags.DEFINE_string('ckpt', './ckpt', 'Check point direction')
 flags.DEFINE_float('lr', 0.001, 'Learning rate')
 flags.DEFINE_integer('batch', 100, 'Batch size')
-flags.DEFINE_integer('epoch', 100, 'Number of epochs to train')
+flags.DEFINE_integer('total_steps', 10000, 'Number of steps to train')
 
 FLAGS = flags.FLAGS
 
-sess = tf.InteractiveSession()
+sess = tf.Session()
 
 
 def main(_):
@@ -24,8 +25,17 @@ def main(_):
     encoder = tae()
     encoder.forward()
 
-    writer = tf.summary.FileWriter(FLAGS.logdir, sess.graph)
-    writer.flush()
+    sess.run(tf.global_variables_initializer())
+
+    writer = tf.summary.FileWriter(FLAGS.logdir)
+    merged = tf.summary.merge_all()
+    writer.add_graph(sess.graph)
+    writer.add_summary(sess.run(merged, feed_dict={encoder.input: np.random.uniform(-1, 1, [40, 784]),
+                                                   encoder.shift: np.random.randint(0, 3, [40, 2]),
+                                                   encoder.expectation: np.random.uniform(-1, 1, [40, 784])}), 0)
+    writer.close()
+    # writer.flush()
 
 if __name__ == "__main__":
     tf.app.run()
+

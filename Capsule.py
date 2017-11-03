@@ -12,6 +12,7 @@ class Capsule:
         self.activation_fn = activation_fn
         self.weight_decay = weight_decay
         self.name = name
+        self.output = None
 
     def forward(self, input, shift):
         with tf.variable_scope(self.name):
@@ -31,7 +32,7 @@ class Capsule:
                                                      stddev=math.sqrt(2. / self.num_recognise_units / 2.)),
                                                  weights_regularizer=layers.l2_regularizer(self.weight_decay),
                                                  biases_regularizer=layers.l2_regularizer(self.weight_decay))
-            location = location + shift
+            location = location + tf.cast(shift, tf.float32)
             # predict probability
             probability = layers.fully_connected(recognition, num_outputs=1,
                                                  activation_fn=self.activation_fn, scope='probability',
@@ -58,3 +59,5 @@ class Capsule:
                                                 biases_regularizer=layers.l2_regularizer(self.weight_decay))
 
             self.output = tf.multiply(output, probability)
+
+            return self.output
