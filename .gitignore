@@ -1,3 +1,5 @@
 .idea/
 logs/
 ckpt/
+__pycache__/
+
