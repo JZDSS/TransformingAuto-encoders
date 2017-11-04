@@ -6,8 +6,8 @@ from Capsule import Capsule
 
 class TransformingAutoEncoder:
 
-    def __init__(self, dim_input=784, num_recognise_units=10, num_generation_units=20, activation_fn=tf.tanh,
-                 name='TransformingAutoEncoder', num_capsules=60, weight_decay=0.95):
+    def __init__(self, dim_input=784, num_recognise_units=40, num_generation_units=40, activation_fn=tf.tanh,
+                 name='TransformingAutoEncoder', num_capsules=25, weight_decay=0.95):
 
         self.dim_input = dim_input
         self.input = tf.placeholder(tf.float32, shape=[None, self.dim_input], name='input')
@@ -37,9 +37,9 @@ class TransformingAutoEncoder:
                 self.capsule_outputs.append(capsule_output)
 
             with tf.variable_scope('loss'):
-                self.prediction = self.activation_fn(tf.add_n(self.capsule_outputs) / self.num_capsules)
+                self.prediction = self.activation_fn(tf.add_n(self.capsule_outputs)/self.num_capsules)
                 tf.losses.mean_squared_error(self.expectation, self.prediction)
-                self.loss = tf.losses.get_total_loss()
+                self.loss = tf.losses.get_total_loss(add_regularization_losses=False)
 
                 tf.summary.scalar('loss', self.loss)
                 tf.summary.image('expectation', tf.reshape(self.expectation,
