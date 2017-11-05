@@ -10,11 +10,12 @@ flags.DEFINE_string('logdir', './logs', 'Log direction')
 flags.DEFINE_string('ckptdir', './ckpt', 'Check point direction')
 flags.DEFINE_float('learning_rate', 0.0001, 'Learning rate')
 flags.DEFINE_integer('batch_size', 100, 'Batch size')
-flags.DEFINE_integer('total_steps', 100000, 'Number of steps to train')
+flags.DEFINE_integer('total_steps', 1000000, 'Number of steps to train')
 flags.DEFINE_float('weight_decay', 0.0001, 'Weight decay')
 flags.DEFINE_float('momentum', 0.95, 'Momentum')
 
 FLAGS = flags.FLAGS
+
 
 sess = tf.Session()
 

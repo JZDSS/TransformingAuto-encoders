@@ -37,7 +37,7 @@ class TransformingAutoEncoder:
                 self.capsule_outputs.append(capsule_output)
 
             with tf.variable_scope('loss'):
-                self.prediction = self.activation_fn(tf.add_n(self.capsule_outputs)/self.num_capsules)
+                self.prediction = self.activation_fn(tf.add_n(self.capsule_outputs))
                 tf.losses.mean_squared_error(self.expectation, self.prediction)
                 self.loss = tf.losses.get_total_loss(add_regularization_losses=False)
 

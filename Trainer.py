@@ -37,7 +37,7 @@ class Trainer():
                 trans_y = np.random.randint(-shift, shift)
 
                 trans_img = np.roll(np.roll(X[i], trans_x, axis=0), trans_y, axis=1)
-                expectation.append((trans_img.flatten() - 0.5) * 2)
+                expectation.append((trans_img.flatten()-0.5)*2)
                 original.append((input[i] - 0.5) * 2)
                 shift_list.append((trans_x, trans_y))
 
@@ -62,7 +62,7 @@ class Trainer():
         with tf.name_scope('train'):
             global_step = tf.Variable(1, name="global_step")
             learning_rate = tf.train.exponential_decay(self.learning_rate,
-                                                       global_step, 100, 0.98, True, "learning_rate")
+                                                       global_step, 500, 0.98, True, "learning_rate")
             train_step = tf.train.AdamOptimizer(self.learning_rate).minimize(
                 self.model.loss, global_step=global_step)
             tf.summary.scalar('learning_rate', learning_rate)
@@ -79,14 +79,12 @@ class Trainer():
             if tf.gfile.Exists(os.path.join(self.ckptdir, 'checkpoint')):
                 saver.restore(sess, os.path.join(self.ckptdir, 'model.ckpt'))
             else:
+                tf.gfile.MkDir(self.ckptdir)
                 sess.run(tf.global_variables_initializer())
 
             for i in range(self.total_steps):
-                print(i)
-                if i % 10000 == 9999:
-                    time.sleep(300)
                 sess.run(train_step, feed_dict=self.get_batch())
-                if i % 100 == 0 and i != 0:  # Record summaries and test-set accuracy
+                if i % 1000 == 0 and i != 0:  # Record summaries and test-set accuracy
                     summary = sess.run(merged, feed_dict=self.get_batch())
                     self.train_writer.add_summary(summary, i)
 
